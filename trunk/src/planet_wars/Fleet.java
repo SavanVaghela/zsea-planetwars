@@ -1,4 +1,5 @@
-package planet_wars;
+//package planet_wars;
+
 
 public class Fleet implements Comparable, Cloneable {
   // Initializes a fleet.
@@ -14,7 +15,7 @@ public class Fleet implements Comparable, Cloneable {
 
   // Initializes a fleet.
   public Fleet(int owner, int numShips) {
-    this.owner = owner;
+    this.owner = owner; 
     this.numShips = numShips;
     this.sourcePlanet = -1;
     this.destinationPlanet = -1;
@@ -30,10 +31,6 @@ public class Fleet implements Comparable, Cloneable {
 
   public int NumShips() {
     return numShips;
-  }
-
-  public int SourcePlanet() {
-    return sourcePlanet;
   }
 
   public int DestinationPlanet() {
@@ -76,7 +73,7 @@ public class Fleet implements Comparable, Cloneable {
   private int totalTripLength;
   private int turnsRemaining;
 
-  private Fleet(Fleet _f) {
+  public Fleet(Fleet _f) {
     owner = _f.owner;
     numShips = _f.numShips;
     sourcePlanet = _f.sourcePlanet;
