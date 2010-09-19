@@ -71,7 +71,7 @@ public class Fleet implements Comparable, Cloneable {
   private int sourcePlanet;
   private int destinationPlanet;
   private int totalTripLength;
-  private int turnsRemaining;
+  public int turnsRemaining;
 
   public Fleet(Fleet _f) {
     owner = _f.owner;

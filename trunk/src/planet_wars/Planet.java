@@ -60,6 +60,9 @@ public class Planet implements Cloneable {
   public double Score() {
     return score;
   }
+  public int Baseline() {
+    return baseline;
+  }
   
   private int planetID;
   private int owner;
@@ -68,7 +71,7 @@ public class Planet implements Cloneable {
   private double x, y;
   public double score;
   private double d_2_e, d_2_o;
-  private double baseline;
+  private int baseline;
   public double ATTACK_PRIORITY;
 
   public Planet(Planet _p) {

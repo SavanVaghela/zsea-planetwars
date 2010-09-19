@@ -7,9 +7,6 @@
 import java.util.*;
 import java.io.*;
 
-//import MainBot.MyBot;
-
-//import AggregateBot.MyBot;
 
 public class PlanetWars {
   // Constructs a PlanetWars object instance, given a string containing a
@@ -18,7 +15,7 @@ public class PlanetWars {
     planets = new ArrayList<Planet>();
     fleets = new ArrayList<Fleet>();
     ParseGameState(gameStateString);
-   
+ 
   }
 
   // Returns the number of planets. Planets are numbered starting with 0.
