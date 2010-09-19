@@ -1,4 +1,4 @@
-package planet_wars;
+//package planet_wars;
 
 public class Planet implements Cloneable {
   // Initializes a planet.
@@ -9,6 +9,7 @@ public class Planet implements Cloneable {
     this.growthRate = growthRate;
     this.x = x;
     this.y = y;
+    this.ATTACK_PRIORITY = 1; 
   }
 
   // Accessors and simple modification functions. These should be mostly
@@ -53,19 +54,31 @@ public class Planet implements Cloneable {
     numShips -= amount;
   }
 
+  public void Score(double newScore) {
+    score = newScore;
+  }
+  public double Score() {
+    return score;
+  }
+  
   private int planetID;
   private int owner;
   private int numShips;
   private int growthRate;
   private double x, y;
+  public double score;
+  private double d_2_e, d_2_o;
+  private double baseline;
+  public double ATTACK_PRIORITY;
 
-  private Planet(Planet _p) {
+  public Planet(Planet _p) {
     planetID = _p.planetID;
     owner = _p.owner;
     numShips = _p.numShips;
     growthRate = _p.growthRate;
     x = _p.x;
     y = _p.y;
+    ATTACK_PRIORITY = _p.ATTACK_PRIORITY;
   }
 
   public Object clone() {

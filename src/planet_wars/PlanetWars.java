@@ -1,4 +1,4 @@
-package planet_wars;
+//package planet_wars;
 
 // Contestants do not need to worry about anything in this file. This is just
 // helper code that does the boring stuff for you, so you can focus on the
@@ -7,6 +7,10 @@ package planet_wars;
 import java.util.*;
 import java.io.*;
 
+//import MainBot.MyBot;
+
+//import AggregateBot.MyBot;
+
 public class PlanetWars {
   // Constructs a PlanetWars object instance, given a string containing a
   // description of a game state.
@@ -14,6 +18,7 @@ public class PlanetWars {
     planets = new ArrayList<Planet>();
     fleets = new ArrayList<Fleet>();
     ParseGameState(gameStateString);
+   
   }
 
   // Returns the number of planets. Planets are numbered starting with 0.
@@ -27,6 +32,10 @@ public class PlanetWars {
     return planets.get(planetID);
   }
 
+  //-------
+  public void SetPlanet(Planet newPlanet) {
+    planets.set(newPlanet.PlanetID(), newPlanet);
+  }
   // Returns the number of fleets.
   public int NumFleets() {
     return fleets.size();
@@ -119,7 +128,7 @@ public class PlanetWars {
         r.add(f);
       }
     }
-    return r;
+  return r;
   }
 
   // Returns the distance between two planets, rounded up to the next highest
@@ -145,7 +154,7 @@ public class PlanetWars {
   // is not instant. See the Distance() function for more info.
   public void IssueOrder(int sourcePlanet, int destinationPlanet, int numShips) {
     System.out.println("" + sourcePlanet + " " + destinationPlanet + " "
-        + numShips);
+        + numShips);  
     System.out.flush();
   }
 
@@ -164,7 +173,12 @@ public class PlanetWars {
         + numShips);
     System.out.flush();
   }
-
+/*
+  public void IssueOrder(Order order){
+     System.out.println("" + order.src.PlanetID() + " " + order.dst.PlanetID() + " "
+         + order.numShips);
+  }
+  */
   // Sends the game engine a message to let it know that we're done sending
   // orders. This signifies the end of our turn.
   public void FinishTurn() {
@@ -257,6 +271,7 @@ public class PlanetWars {
         int numShips = Integer.parseInt(tokens[4]);
         int growthRate = Integer.parseInt(tokens[5]);
         Planet p = new Planet(planetID++, owner, numShips, growthRate, x, y);
+   
         planets.add(p);
       }
       else if (tokens[0].equals("F")) {
@@ -284,7 +299,7 @@ public class PlanetWars {
   // the starting state of a game. See the project wiki for a description of
   // the file format. It should be called the Planet Wars Point-in-Time
   // format. On success, return 1. On failure, returns 0.
-  private int LoadMapFromFile(String mapFilename) {
+  public int LoadMapFromFile(String mapFilename) {
     String s = "";
     BufferedReader in = null;
     try {
