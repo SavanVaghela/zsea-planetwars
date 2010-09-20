@@ -1,45 +1,42 @@
- // package MainBot;
-  import java.io.BufferedWriter;
-  import java.io.FileWriter;
-// import java.io.BufferedWriter;
-  import java.util.*;
+//package MainBot;
 
-//import planet_wars.Planet;
-
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.*;
 //import planet_wars.*;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 //MyBot 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 public class MyBot {
   public static int Turn = 0;
 
- // public static Debugger dBg = new Debugger("loooooooooog.txt");
-  
+  // public static Debugger dBg = new Debugger("loooooooooog.txt");
+
   public static List<Order> defenseOrders = new LinkedList<Order>();
   public static List<Order> attackOrders = new LinkedList<Order>();
   private static List<Score> defenseScores = new LinkedList<Score>();
   private static List<Planet> destinationPlanets = null;
 
-  
   public static void DoTurn(PlanetWars pw) {
- //   Turn++;
- //   dBg.Writeln(":: Init Start ::");
-    
+    // Turn++;
+    // dBg.Writeln(":: Init Start ::");
+
     Game.Initialize(pw);
- //   dBg.Writeln(":: Init End ::");
-    
+    // dBg.Writeln(":: Init End ::");
+
     Game.Premodelling();
- //   dBg.Writeln(":: Premodeling end::");
+    // dBg.Writeln(":: Premodeling end::");
     PrepareContainers();
- //   dBg.Writeln(":: PrepareContainers end::");
+    // dBg.Writeln(":: PrepareContainers end::");
     CalculateScores();
- //   dBg.Writeln(":: CAlc scores end::");
+    // dBg.Writeln(":: CAlc scores end::");
     CalculateDefense();
-//    dBg.Writeln(":: Cals def end::");
+    // dBg.Writeln(":: Cals def end::");
     CalculateAttack();
-//    dBg.Writeln(":: Cals attack end::");
+    // dBg.Writeln(":: Cals attack end::");
     Game.IssueOrders();
- //   dBg.Writeln(":: Issue order end::");
+    // dBg.Writeln(":: Issue order end::");
   }
 
   private static void PrepareContainers() {
@@ -64,10 +61,10 @@ public class MyBot {
     for (Planet planet : Game.myPlanets) {
       int defensePriority = -1;
       if (planet.NumShips() < 0) {
-        defensePriority = 5;
+        defensePriority = Game.DEFENSE_FROM_OCCUPATION;
       }
       else if (planet.NumShips() < planet.Baseline()) {
-        defensePriority = 10;
+        defensePriority = Game.DEFENSE_FROM_BASELINE;
       }
       if (defensePriority != -1) {
         Score score = new Score(null, planet, 0);
@@ -78,7 +75,7 @@ public class MyBot {
         defenseScores.add(score);
       }
     }
-    
+
     // dBg.Writeln("::Sort start::");
     Game.Sort(defenseScores, new ScoreComparator());
     Game.Sort(destinationPlanets, new AggregateScoreComparator());
@@ -97,22 +94,22 @@ public class MyBot {
   }
   private static List<Order> GetDefenceOrdersFor(Planet planet) {
     List<Order> orders = new LinkedList<Order>();
-  /*  for (Score score : defenseScores) {
-    // get source planet
-    List<Score> sourceScores = GetSourceScores(score.dst);
-    score.src = sourceScores.first().src;
-    // calculate number of ships
-    int numShips = 0;
+    /*for (Score score : defenseScores) {
+      // get source planet
+      LinkedList<Score> sourceScores = GetSourceScores(score.dst);
+      score.src = sourceScores.getFirst().src;
+      // calculate number of ships
+      int numShips = 0;
       if (score.dst.NumShips() < 0) {
         numShips = 1 - score.dst.NumShips();
       }
       else {
         numShips = Game.PLANETS_BASELINE - score.dst.NumShips();
       }
-    if ((score.src.NumShips() - score.src.Baseline() - numShips) > 0) {
-    Order order = new Order(score.src, score.dst, numShips);
-    orders.add(order);
-    }
+      if ((score.src.NumShips() - score.src.Baseline() - numShips) > 0) {
+        Order order = new Order(score.src, score.dst, numShips);
+        orders.add(order);
+      }
     }*/
     return (orders.size() != 0) ? orders : null; 
   }
@@ -131,12 +128,12 @@ public class MyBot {
 
   private static List<Order> GetAttackOrdersFor(Planet targetPlanet) {
     List<Order> orders = new ArrayList<Order>();
-  //  dBg.Writeln("::Getting oreder::");
+    // dBg.Writeln("::Getting oreder::");
     int growthTurnsAnalized = 0;
     int shipsOnTargetPlanet = targetPlanet.NumShips();
     shipsOnTargetPlanet += (targetPlanet.Owner() == 0 ? Game.ATTACKER_SHIPS_LAY_UP_NEUTRAL
                                                       : Game.ATTACKER_SHIPS_LAY_UP_ENEMY);
-    
+
     List<Score> sourceScores = GetSourceScores(targetPlanet);
     for (Score s : sourceScores) {
 
@@ -183,24 +180,23 @@ public class MyBot {
     if (shipsOnTargetPlanet > 0)
       return null;
     for (Order o : orders) {
-    
-     
+
       o.src.RemoveShips(o.numShips);
-     
+
     }
- //   dBg.Writeln("::oreder complete::");
+    // dBg.Writeln("::oreder complete::");
     return orders;
   }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////  GetSourceScores  ////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   @SuppressWarnings("unchecked")
-  private static List<Score> GetSourceScores(Planet dstPlanet) {
-    List<Score> sourceScores = new LinkedList<Score>();
+  private static LinkedList<Score> GetSourceScores(Planet dstPlanet) {
+    LinkedList<Score> sourceScores = new LinkedList<Score>();
     List<Planet> filteredMyPlanets = new LinkedList<Planet>(Game.myPlanets);
-    filteredMyPlanets.remove(dstPlanet); 
-    
-    for (Planet srcPlanet : filteredMyPlanets ) {
+    filteredMyPlanets.remove(dstPlanet);
+
+    for (Planet srcPlanet : filteredMyPlanets) {
       Score score = new Score(srcPlanet, dstPlanet, 0);
       // dBg.Writeln("::CalculateSourceScore start::");
       score.value = CalculateSourceScore(srcPlanet, dstPlanet);
@@ -210,7 +206,7 @@ public class MyBot {
     Game.Sort(sourceScores, new ScoreComparator());
     return sourceScores;
   }
-  
+
   private static double CalculateSourceScore(Planet src, Planet dst) {
     final double GR_WEIGHT = 5.0;
     return (double) (src.NumShips() - src.Baseline())
@@ -218,7 +214,6 @@ public class MyBot {
         + GR_WEIGHT * src.GrowthRate();
   }
 
- 
   private static double CalculateAggregateScore(Planet targetP) {
     double distanceScore = targetP.ATTACK_PRIORITY
         * (Game.GENERAL_DISTANCE_PRIORITY * CalculateDistanceScore(targetP) + Game.NUMB_OF_SHIPS_PRIORITY
@@ -247,17 +242,13 @@ public class MyBot {
         / (Game.GetSummaryPlanetGrowthRate(2) + 1);
     double myScore = myD / (Game.myPlanets.size() + 1);
     double enemyScore = 0;
-    if (Game.enemyPlanets.size() == 1 && currPlanet.Owner() == 2) 
+    if (Game.enemyPlanets.size() == 1 && currPlanet.Owner() == 2)
       enemyScore = myScore * gameRatio;
     else
       enemyScore = enemyD / (Game.enemyPlanets.size() + 1);
     return enemyScore / myScore;
   }
-/*
-  private static int calculateShips(Planet src, Planet dst) {
-    return src.NumShips() / 2;
-  }
-*/
+
   // //////////////////////////////////////////////////////////////////////////////////////////////////
   // // MAIN ////////////////////
   // //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -278,7 +269,6 @@ public class MyBot {
         switch (c) {
           case '\n':
             if (line.equals("go")) {
-
               PlanetWars pw = new PlanetWars(message);
               DoTurn(pw);
               pw.FinishTurn();
@@ -296,10 +286,10 @@ public class MyBot {
       }
     }
     catch (Exception e) {
-   //   dBg.Writeln("main Exeption");
-   //   dBg.Close();
+      // dBg.Writeln("main Exeption");
+      // dBg.Close();
     }
- //   dBg.Close();
+    // dBg.Close();
   }
 
 }
@@ -346,7 +336,7 @@ class FleetTurnsComporator implements Comparator<Fleet> {
 // ScoreComparator
 // /////////////////////////////////////////////////////////////////////////////////////////////
 @SuppressWarnings("rawtypes")
-class ScoreComparator implements Comparator{
+class ScoreComparator implements Comparator {
   public int compare(Object score1, Object score2) {
     double value1 = ((Score) score1).value;
     double value2 = ((Score) score2).value;
