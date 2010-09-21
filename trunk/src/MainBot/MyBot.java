@@ -11,7 +11,7 @@ import java.util.*;
 public class MyBot {
   public static int Turn = 0;
 
-  // public static Debugger dBg = new Debugger("loooooooooog.txt");
+  //public static Debugger dBg = new Debugger("loooooooooog.txt");
 
   public static List<Order> defenseOrders = new LinkedList<Order>();
   public static List<Order> attackOrders = new LinkedList<Order>();
@@ -34,9 +34,9 @@ public class MyBot {
     CalculateDefense();
     // dBg.Writeln(":: Cals def end::");
     CalculateAttack();
-    // dBg.Writeln(":: Cals attack end::");
+    //dBg.Writeln(":: Cals attack end::");
     Game.IssueOrders();
-    // dBg.Writeln(":: Issue order end::");
+    //dBg.Writeln(":: Issue order end::");
   }
 
   private static void PrepareContainers() {
@@ -63,15 +63,17 @@ public class MyBot {
       if (planet.NumShips() < 0) {
         defensePriority = Game.DEFENSE_FROM_OCCUPATION;
       }
-      else if (planet.NumShips() < planet.Baseline()) {
+      else if (planet.NumShips() < Game.PLANETS_BASELINE) {
         defensePriority = Game.DEFENSE_FROM_BASELINE;
       }
       if (defensePriority != -1) {
         Score score = new Score(null, planet, 0);
-        final double GR_WEIGHT = 5.0;
-        score.value = CalculateDistanceScore(planet) + GR_WEIGHT
-            * planet.GrowthRate() - (planet.NumShips() + planet.Baseline())
-            / 10.0 + defensePriority;
+        final double GR_WEIGHT = 3.0;
+        score.value = CalculateDistanceScore(planet) / 4.0
+            + GR_WEIGHT * planet.GrowthRate()
+            + defensePriority;
+        //dBg.Writeln("defence score: " + score.value + "=" + 200.0 * CalculateDistanceScore(planet) + "+" 
+        //    + GR_WEIGHT * planet.GrowthRate() + "+" + defensePriority);
         defenseScores.add(score);
       }
     }
@@ -86,32 +88,48 @@ public class MyBot {
   ////////////////////////////////////  CalculateDefence  ////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   private static void CalculateDefense() {
-    for (Planet planet : Game.myPlanets) {
-      List<Order> orders = GetDefenceOrdersFor(planet);
+    for (Score score : defenseScores) {
+      List<Order> orders = GetDefenseOrdersFor(score.dst);
       if (orders != null)
         defenseOrders.addAll(orders);
     }
   }
-  private static List<Order> GetDefenceOrdersFor(Planet planet) {
+  
+  private static List<Order> GetDefenseOrdersFor(Planet planet) {
     List<Order> orders = new LinkedList<Order>();
-    /*for (Score score : defenseScores) {
-      // get source planet
-      LinkedList<Score> sourceScores = GetSourceScores(score.dst);
-      score.src = sourceScores.getFirst().src;
-      // calculate number of ships
-      int numShips = 0;
-      if (score.dst.NumShips() < 0) {
-        numShips = 1 - score.dst.NumShips();
+    // get source planets
+    LinkedList<Score> sourceScores = GetSourceScores(planet);
+    // calculate number of ships
+    int numShipsNeededToDefense = 0;
+    if (planet.NumShips() < 0) {
+      numShipsNeededToDefense = 1 - planet.NumShips();
+    }
+    else {
+      numShipsNeededToDefense = Game.PLANETS_BASELINE - planet.NumShips();
+    }
+    int sumNumShipsToDefense = 0;
+    for (Score score : sourceScores) {
+      int numShipsToDefense = score.src.NumShips() - Game.PLANETS_BASELINE;
+      if (numShipsToDefense <= 0)
+        continue;
+      
+      sumNumShipsToDefense += numShipsToDefense;
+      int diff = sumNumShipsToDefense - numShipsNeededToDefense;
+      numShipsToDefense = (diff > 0) ? numShipsToDefense - diff : numShipsToDefense;
+      Order order = new Order(score.src, planet, numShipsToDefense);
+      orders.add(order);
+      sumNumShipsToDefense -= diff;
+      if (sumNumShipsToDefense >= numShipsNeededToDefense)
+        break;
+    }
+    if (sumNumShipsToDefense >= numShipsNeededToDefense) {
+      for (Order o : orders) {
+        o.src.RemoveShips(o.numShips);
       }
-      else {
-        numShips = Game.PLANETS_BASELINE - score.dst.NumShips();
-      }
-      if ((score.src.NumShips() - score.src.Baseline() - numShips) > 0) {
-        Order order = new Order(score.src, score.dst, numShips);
-        orders.add(order);
-      }
-    }*/
-    return (orders.size() != 0) ? orders : null; 
+      return orders;
+    }
+    else
+      return null;
   }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////  CalculateAttack  ////////////////////////////////////////
@@ -180,9 +198,7 @@ public class MyBot {
     if (shipsOnTargetPlanet > 0)
       return null;
     for (Order o : orders) {
-
       o.src.RemoveShips(o.numShips);
-
     }
     // dBg.Writeln("::oreder complete::");
     return orders;
@@ -209,7 +225,7 @@ public class MyBot {
 
   private static double CalculateSourceScore(Planet src, Planet dst) {
     final double GR_WEIGHT = 5.0;
-    return (double) (src.NumShips() - src.Baseline())
+    return (double) (src.NumShips() - Game.PLANETS_BASELINE)
         / Math.pow((double) Game.Distance(src.PlanetID(), dst.PlanetID()), 2)
         + GR_WEIGHT * src.GrowthRate();
   }
@@ -218,7 +234,6 @@ public class MyBot {
     double distanceScore = targetP.ATTACK_PRIORITY
         * (Game.GENERAL_DISTANCE_PRIORITY * CalculateDistanceScore(targetP) + Game.NUMB_OF_SHIPS_PRIORITY
             * targetP.GrowthRate() / (targetP.NumShips() + 1));
-
     return distanceScore;
   }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,7 +261,7 @@ public class MyBot {
       enemyScore = myScore * gameRatio;
     else
       enemyScore = enemyD / (Game.enemyPlanets.size() + 1);
-    return enemyScore / myScore;
+    return 1.0 / myScore;
   }
 
   // //////////////////////////////////////////////////////////////////////////////////////////////////

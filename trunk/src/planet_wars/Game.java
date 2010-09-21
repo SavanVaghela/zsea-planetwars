@@ -10,14 +10,14 @@ public class Game {
   public static double ENEMY_ATTACK_PRIORITY = 1.1;
   public static int ATTACKER_SHIPS_LAY_UP_ENEMY = 15;
   public static int ATTACKER_SHIPS_LAY_UP_NEUTRAL = 1;
-  public static int PLANETS_BASELINE = 25;
+  public static int PLANETS_BASELINE = 13;
   public static int PLANETS_HELP_STOCK = 20;
   public static int NUMB_OF_SHIPS_PRIORITY = 40;
   public static double GENERAL_DISTANCE_PRIORITY = 1;
   public static double EXPONENTIAL_DISTANCE_PRIORITY = 2;
-  public static int DEFENSE_FROM_OCCUPATION = 15;
+  public static int DEFENSE_FROM_OCCUPATION = 20;
   public static int DEFENSE_FROM_BASELINE = 5;
-    
+
   public static void Initialize(PlanetWars _pw) {
     pw = _pw;
 
