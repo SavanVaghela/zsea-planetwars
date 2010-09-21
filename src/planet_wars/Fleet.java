@@ -1,6 +1,5 @@
 //package planet_wars;
 
-
 public class Fleet implements Comparable, Cloneable {
   // Initializes a fleet.
   public Fleet(int owner, int numShips, int sourcePlanet,
