@@ -1,21 +1,29 @@
 //package planet_wars;
-import java.util.*;
-//import MainBot.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+
+//import MainBot.MyBot;
 
 public class Game {
-  public static List<Planet> myPlanets, enemyPlanets, neutralPlanets, allPlanets;
+  public static List<Planet> myPlanets, enemyPlanets, neutralPlanets,
+      allPlanets;
   public static List<Fleet> myFleets, enemyFleets;
   public static PlanetWars pw;
 
   public static double ENEMY_ATTACK_PRIORITY = 1.1;
   public static int ATTACKER_SHIPS_LAY_UP_ENEMY = 15;
   public static int ATTACKER_SHIPS_LAY_UP_NEUTRAL = 1;
-  public static int PLANETS_BASELINE = 13;
+  public static int PLANETS_BASELINE = 10;
   public static int PLANETS_HELP_STOCK = 20;
-  public static int NUMB_OF_SHIPS_PRIORITY = 40;
-  public static double GENERAL_DISTANCE_PRIORITY = 1;
-  public static double EXPONENTIAL_DISTANCE_PRIORITY = 2;
-  public static int DEFENSE_FROM_OCCUPATION = 20;
+  public static int NUMB_OF_SHIPS_PRIORITY = 1;
+  public static double GENERAL_DISTANCE_PRIORITY = 100;
+  public static double EXPONENTIAL_DISTANCE_PRIORITY = 1.5; // 1.5
+  public static double EXPONENTIAL_POWER_DISTANCE_PRIORITY = 10; // 10
+  public static int DEFENSE_FROM_OCCUPATION = 15;
   public static int DEFENSE_FROM_BASELINE = 5;
 
   public static void Initialize(PlanetWars _pw) {
@@ -50,19 +58,50 @@ public class Game {
     enemyFleets = new ArrayList<Fleet>();
     for (Fleet f : pw.EnemyFleets())
       enemyFleets.add(new Fleet(f));
+
+    List<Fleet> sortedFleets = new ArrayList<Fleet>(myFleets);
+    sortedFleets.addAll(enemyFleets);
+    Game.Sort(sortedFleets, new FleetTurnsComparator());
+    for (Fleet fleet : sortedFleets) {
+      Planet p = Game.GetPlanet(fleet.DestinationPlanet());
+      p.AddFleet(fleet);
+    }
+  }
+
+  public static void Rollback() {
+    LinkedList<Planet> planetsForRemove = new LinkedList<Planet>();
+    for (Planet planet : myPlanets) {
+      if (planet.Owner() == 0) {
+        neutralPlanets.remove(planet);
+      }
+      if (planet.Owner() == 2) {
+        enemyPlanets.remove(planet);
+      }
+      if (planet.Owner() != 1) {
+        planetsForRemove.add(planet);
+      }
+    }
+    myPlanets.removeAll(planetsForRemove);
+    // true rollback
+    for (Planet planet : allPlanets) {
+      planet.NumShipsModelled(planet.NumShips());
+      planet.OwnerModelled(planet.Owner());
+    }
   }
 
   public static Planet GetPlanet(int planetID) {
     return allPlanets.get(planetID);
   }
-///////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////  Premodelling  //////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////   
+
+  // /////////////////////////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////////////// Premodelling
+  // //////////////////////////////////////////
+  // /////////////////////////////////////////////////////////////////////////////////////////////////
   public static void Premodelling() {
     // MyBot.dBg.Writeln("\r\n:: Turn " + MyBot.Turn + ":");
     List<Fleet> fleets = Fleets();
     int turnsModeled = 0;
-    Game.Sort(fleets, new FleetTurnsComporator());
+    Game.Sort(fleets, new FleetTurnsComparator());
     for (Fleet fleet : fleets) {
       // MyBot.dBg.Writeln("fleet remain::" + fleet.TurnsRemaining());
       int dstPlanetID = fleet.DestinationPlanet();
@@ -126,20 +165,31 @@ public class Game {
     }
   }
 
-  public static void ChangePlanetOwner(Planet p, int newOwner)
-  {
-    switch(p.Owner()) {
-      case 0:  neutralPlanets.remove(p); break;
-      case 1:  myPlanets.remove(p);      break;
-      default: enemyPlanets.remove(p);   break;
+  public static void ChangePlanetOwner(Planet p, int newOwner) {
+    switch (p.Owner()) {
+      case 0:
+        neutralPlanets.remove(p);
+        break;
+      case 1:
+        myPlanets.remove(p);
+        break;
+      default:
+        enemyPlanets.remove(p);
+        break;
     }
-    switch(newOwner) {
-      case 0:  neutralPlanets.add(p); break;
-      case 1:  myPlanets.add(p);      break;
-      default: enemyPlanets.add(p);   break;
+    switch (newOwner) {
+      case 0:
+        neutralPlanets.add(p);
+        break;
+      case 1:
+        myPlanets.add(p);
+        break;
+      default:
+        enemyPlanets.add(p);
+        break;
     }
   }
-    
+
   public static LinkedList<Fleet> GetAttackedFleets(Planet p) {
     return GetAttackedFleets(p, (p.Owner() == 1 ? 2 : 1));
   }
@@ -152,7 +202,7 @@ public class Game {
         fleets.add(fleet);
     return fleets;
   }
-    
+
   public static LinkedList<Fleet> GetReinforcementFleets(Planet p) {
     LinkedList<Fleet> fleets = new LinkedList<Fleet>();
     List<Fleet> targetFleets = (p.Owner() == 1 ? myFleets : enemyFleets);
@@ -178,7 +228,7 @@ public class Game {
     }
     return gr;
   }
-    
+
   public static <T> void Sort(Collection<T> collection, Comparator<T> comp) {
     // Weak sort O(n^2) on a quick hand :)
     List<T> res = new LinkedList<T>();
