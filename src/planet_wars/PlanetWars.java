@@ -4,9 +4,14 @@
 // helper code that does the boring stuff for you, so you can focus on the
 // interesting stuff. That being said, you're welcome to change anything in
 // this file if you know what you're doing.
-import java.util.*;
-import java.io.*;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class PlanetWars {
   // Constructs a PlanetWars object instance, given a string containing a
@@ -15,7 +20,9 @@ public class PlanetWars {
     planets = new ArrayList<Planet>();
     fleets = new ArrayList<Fleet>();
     ParseGameState(gameStateString);
- 
+    List<Planet> f = new LinkedList<Planet>();
+    Iterator<Planet> it = f.iterator();
+
   }
 
   // Returns the number of planets. Planets are numbered starting with 0.
@@ -29,10 +36,11 @@ public class PlanetWars {
     return planets.get(planetID);
   }
 
-  //-------
+  // -------
   public void SetPlanet(Planet newPlanet) {
     planets.set(newPlanet.PlanetID(), newPlanet);
   }
+
   // Returns the number of fleets.
   public int NumFleets() {
     return fleets.size();
@@ -125,7 +133,7 @@ public class PlanetWars {
         r.add(f);
       }
     }
-  return r;
+    return r;
   }
 
   // Returns the distance between two planets, rounded up to the next highest
@@ -151,7 +159,7 @@ public class PlanetWars {
   // is not instant. See the Distance() function for more info.
   public void IssueOrder(int sourcePlanet, int destinationPlanet, int numShips) {
     System.out.println("" + sourcePlanet + " " + destinationPlanet + " "
-        + numShips);  
+        + numShips);
     System.out.flush();
   }
 
@@ -170,12 +178,12 @@ public class PlanetWars {
         + numShips);
     System.out.flush();
   }
-/*
-  public void IssueOrder(Order order){
-     System.out.println("" + order.src.PlanetID() + " " + order.dst.PlanetID() + " "
-         + order.numShips);
-  }
-  */
+
+  /*
+   * public void IssueOrder(Order order){ System.out.println("" +
+   * order.src.PlanetID() + " " + order.dst.PlanetID() + " " + order.numShips);
+   * }
+   */
   // Sends the game engine a message to let it know that we're done sending
   // orders. This signifies the end of our turn.
   public void FinishTurn() {
@@ -268,7 +276,7 @@ public class PlanetWars {
         int numShips = Integer.parseInt(tokens[4]);
         int growthRate = Integer.parseInt(tokens[5]);
         Planet p = new Planet(planetID++, owner, numShips, growthRate, x, y);
-   
+
         planets.add(p);
       }
       else if (tokens[0].equals("F")) {
