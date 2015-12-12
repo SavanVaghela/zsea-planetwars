@@ -1,0 +1,1 @@
+This is a ZSEA\_Team (Zaporizhia State Engineering Academy, Department of Software of automated systems) bot for Google AI Challenge 2010.
